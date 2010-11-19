@@ -1,0 +1,13 @@
+prune ext
+
+graft bin
+graft doc/source
+prune doc/source/generated
+
+include AUTHORS
+include README.rst
+
+
+global-exclude .git*
+global-exclude *.pyc
+

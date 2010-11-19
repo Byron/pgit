@@ -1,6 +1,8 @@
 """Implements the submodule pgit command"""
 from base import CmdBase
 
+from git import RootModule
+
 __all__ = ['SubmoduleCmd']
 
 class SubmoduleCmd(CmdBase):
@@ -11,7 +13,7 @@ class SubmoduleCmd(CmdBase):
 	
 	k_program_name = 'pgit-submodule'
 	k_version = "1.0"
-	k_usage = '%prog '
+	k_usage = '%prog operation [flags]'
 	k_description = """Edit or query a git-repository's submodules"""
 	#} END configuration
 	
@@ -28,6 +30,15 @@ class SubmoduleCmd(CmdBase):
 	def option_parser(self):
 		parser = super(SubmoduleCmd, self).option_parser()
 		
+		hlp = """If set, updates will not be handled recursively, but instead only
+affect the direct submodules of the curent repository. This usually causes inconsistent
+checkouts as children of said submodules might require an update too"""
+		parser.add_option('--non-recursive' , action='store_true', help=hlp)
+		
+		hlp = """If set, the sha of the submodule will be ignored. Instead, the
+submodule's repository will be updated to the latest available revision"""
+		parser.add_option('-l', '--to-latest-revision', action='store_true', help=hlp)
+		
 		return parser
 	
 	def execute(self, options, args):
@@ -35,6 +46,7 @@ class SubmoduleCmd(CmdBase):
 		cmd = 'query'
 		if args:
 			cmd = args[0]
+			args = args[1:]
 		# END handle command parsing
 		
 		if cmd == self.k_query:
@@ -46,7 +58,7 @@ class SubmoduleCmd(CmdBase):
 		elif cmd == self.k_move:
 			pass
 		elif cmd == self.k_update:
-			pass
+			self._exec_update(options, args)
 		else:
 			raise self.parser.error("Invalid operation: %r" % cmd)
 		#END handle operation
@@ -75,5 +87,31 @@ class SubmoduleCmd(CmdBase):
 					msg = (fmt % mhead.ref) + (mhead.ref.tracking_branch() is not None and " (tracking)") or '' 
 			#END handle module
 		#END output each submodule
+	
+	def _exec_update(self, options, args):
+		"""Update the submodules, we allow names of specific ones to be specified as additional args"""
+		args = set(args)
+		sms = self.repo.submodules
+		if args:
+			ssms = set(sm.name for sm in sms)
+			if len(ssms & args) != len(args):
+				raise ValueError("Couldn't find the following submodule's for update: %s" % ", ".join(args - ssms))
+			#END issue error
+		# END pre-check existance of submodules
+		
+		kwargs = dict(
+						recursive=not options.non_recursive,
+						to_latest_revision=options.to_latest_revision
+					)
+		if not args:
+			RootModule(self.repo).update(**kwargs)
+		else:
+			# only updated specific modules .. smartly,but not based on our root
+			for sm in sms:
+				if sm.name in args and sm.module_exists():
+					RootModule(sm.module()).update(**kwargs)
+				# END if name matches filter
+			# END for each submodule
+		# END handle filter
 	
 	#} END handlers

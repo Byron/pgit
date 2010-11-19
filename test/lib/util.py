@@ -17,13 +17,14 @@ __all__ = ['with_rw_repo', 'with_rw_and_rw_remote_repo', 'with_rw_repo_cmd']
 
 #{ Utilities
 
-def localize_submodules(submodules, source_repo, recursive=True):
+def localize_submodules(repo, source_repo, recursive=True):
 	"""Localize the given submodules to use urls as derived from the given source_repo,
 	which is assumed to contain a full checkout of all the modules and submodules.
 	:param recursive: If True, submodules will be handled recursively. Modules
 		will be checked-out as required to get access to the child modules"""
 	assert not source_repo.bare, "Source-Repository must not be bare"
-	for sm in submodules:
+	sms = repo.submodules
+	for sm in sms:
 		# need an update, as we commit after each iteration
 		sm.set_parent_commit(sm.repo.head.commit)
 		smp = join_path(source_repo.working_tree_dir, sm.path)
@@ -34,12 +35,18 @@ def localize_submodules(submodules, source_repo, recursive=True):
 				sm.update(recursive=False)
 			#END get submodule
 			
-			localize_submodules(sm.children(), Repo(smp), recursive=True)
+			localize_submodules(sm.module(), Repo(smp), recursive=True)
 		#END handle recursion
 		
 		# commit after each sm - performance will be fine
-		sm.repo.index.commit("Localized submodule paths")
+		# update sm to the latest head sha
+		sm.binsha = sm.module().head.commit.binsha
+		sm.repo.index.commit("Localized submodule paths of submodule %s" % sm.name)
 	# END for each submodule
+	
+	# our submodules changed, commit the change to 'fix' it
+	repo.index.add(sms)
+	repo.index.commit("Committing submodule changes")
 	
 	
 	
@@ -60,7 +67,7 @@ def with_rw_repo_cmd(rev='HEAD', bare=False):
 	def func_wrapper(func):
 		def wrapper(self, rwrepo, *args, **kwargs):
 			# adjust submodules to point to local destinations on the first level
-			localize_submodules(rwrepo.submodules, Repo(os.path.dirname(__file__))) 
+			localize_submodules(rwrepo, Repo(os.path.dirname(__file__))) 
 			
 			def cmd_call(*args, **kwargs):
 				if 'cwd' not in kwargs:

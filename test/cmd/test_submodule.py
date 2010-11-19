@@ -46,10 +46,9 @@ class TestSubmoduleCmd(TestCmdBase):
 		nsmp = 'newsubmod'
 		psm(SubmoduleCmd.k_add, nsmn, nsmp, sm.url, '--branch', 'master')
 		
-		# url is optional, in case a repository exists
+		# url is optional, in case a repository exists - here it doesn't exist
 		oname = 'othername'
-		psm(SubmoduleCmd.k_add, oname, nsmp)
-		assert rwrepo.submodule(oname).exists()
+		self.failUnlessRaises(ValueError, psm, SubmoduleCmd.k_add, oname, 'doesnt_exist')
 		
 		# it will just return successfully as a submodule with that name
 		# already exists
@@ -72,3 +71,14 @@ class TestSubmoduleCmd(TestCmdBase):
 		
 		# REMOVE
 		########
+		# need at least one name
+		self.failUnlessRaises(OptParseError, psm, SubmoduleCmd.k_remove)
+		
+		# remove both now submodules - same item multiple time will be fine
+		assert nsm.exists()
+		psm(SubmoduleCmd.k_remove, nsm.name, nsm.name, '--force')
+		assert not nsm.exists()
+		
+		
+		
+		

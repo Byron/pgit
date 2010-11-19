@@ -65,17 +65,39 @@ the working tree is empty"""
 		
 		# MOVE
 		######
-		group = OptionGroup(parser, "Move Options")
+		group = OptionGroup(parser, "Move Options", "See Common Options")
 		
-		hlp = """If set, only the submodule's repository will be moved to the destination.
-The configuration will remain unaltered, and is expected to point to the destination path already"""
-		group.add_option('--skip-configuration', action='store_true', default=False, help=hlp)
+		parser.add_option_group(group)
 		
-		hlp = """If set, the submodule's repository will not be moved, only the submodule's
-configuration will be altered."""
+		
+		# REMOVE
+		########
+		group = OptionGroup(parser, "Remove Options")
+		
+		hlp = "If set, the submodule's repository will be removed even though it contains modifications"
+		group.add_option("--force", action='store_true', default=False, help=hlp)
+		
+		hlp = "If set, the operation will be simulated, but not actually performed, i.e. everything remains unchanged."
+		group.add_option("-n", "--dry-run", action='store_true', default=False, help=hlp)
+		
+		parser.add_option_group(group)
+		
+		
+		# COMMON
+		########
+		group = OptionGroup(parser, "Common Options")
+		
+		hlp  = "If set in remove mode, the submodule's configuration will not be removed, but only its repository\n"
+		hlp += "If set in move mode, only the submodule's repository will be moved to the destination.\n"
+		hlp += "The configuration will remain unaltered, and is expected to point to the destination path already"""
+		group.add_option("--skip-configuration", action='store_true', default=False, help=hlp)
+		
+		hlp  = "If set in remove mode, the submodule's repository will not be removed and remain on disk\n"
+		hlp += "If set in move mode, the submodule's repository will not be moved, only the submodule's configuration will be altered."
 		group.add_option('--skip-module', action='store_true', default=False, help=hlp)
 		
 		parser.add_option_group(group)
+		
 		
 		
 		return parser
@@ -172,6 +194,20 @@ configuration will be altered."""
 		print "Successfully moved the repository of submodule %r to %s" % (sm.name, sm.path)
 		
 	def _exec_remove(self, options, args):
-		raise NotImplementedError("todo")
+		if len(args) < 1:
+			raise self.parser.error("Need a at least one submodule's name to remove")
+		#END handle args
+		
+		for sm in self.repo.submodules:
+			if sm.name not in args:
+				continue
+			#END filter by name
+			
+			sm.remove(	module=not options.skip_module, 
+						configuration=not options.skip_configuration,
+						dry_run=options.dry_run,
+						force=options.force
+					)
+		#END for each submodule
 	
 	#} END handlers

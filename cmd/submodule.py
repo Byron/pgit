@@ -35,6 +35,8 @@ class SubmoduleCmd(CmdBase):
 	def option_parser(self):
 		parser = super(SubmoduleCmd, self).option_parser()
 		
+		# UPDATE
+		########
 		group = OptionGroup(parser, "Update Options")
 		
 		hlp = """If set, updates will not be handled recursively, but instead only
@@ -48,6 +50,8 @@ submodule's repository will be updated to the latest available revision"""
 		parser.add_option_group(group)
 		
 		
+		# ADD
+		######
 		group = OptionGroup(parser, "Add Options")
 		hlp = "Specify a tracking branch to use if it is not 'master', which is the default"
 		group.add_option('-b', '--branch', help=hlp)
@@ -55,6 +59,21 @@ submodule's repository will be updated to the latest available revision"""
 		hlp = """If set, the new submodule's repository will be cloned, but not checkedout, i.e.
 the working tree is empty"""
 		group.add_option('--no-checkout', action='store_true', default=False, help=hlp)
+		
+		parser.add_option_group(group)
+		
+		
+		# MOVE
+		######
+		group = OptionGroup(parser, "Move Options")
+		
+		hlp = """If set, only the submodule's repository will be moved to the destination.
+The configuration will remain unaltered, and is expected to point to the destination path already"""
+		group.add_option('--skip-configuration', action='store_true', default=False, help=hlp)
+		
+		hlp = """If set, the submodule's repository will not be moved, only the submodule's
+configuration will be altered."""
+		group.add_option('--skip-module', action='store_true', default=False, help=hlp)
 		
 		parser.add_option_group(group)
 		
@@ -144,7 +163,13 @@ the working tree is empty"""
 		print "Created submodule %r at path %s" % (sm.name, sm.path)
 		
 	def _exec_move(self, options, args):
-		raise NotImplementedError("todo")
+		if len(args) != 2:
+			raise self.parser.error("arguments must be: name destination_path")
+			
+		name, destpath = args
+		sm = self.repo.submodule(name)
+		sm.move(destpath, configuration=not options.skip_configuration, module=not options.skip_module)
+		print "Successfully moved the repository of submodule %r to %s" % (sm.name, sm.path)
 		
 	def _exec_remove(self, options, args):
 		raise NotImplementedError("todo")

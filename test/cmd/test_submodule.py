@@ -47,17 +47,27 @@ class TestSubmoduleCmd(TestCmdBase):
 		psm(SubmoduleCmd.k_add, nsmn, nsmp, sm.url, '--branch', 'master')
 		
 		# url is optional, in case a repository exists
-		psm(SubmoduleCmd.k_add, 'othername', nsmp)
+		oname = 'othername'
+		psm(SubmoduleCmd.k_add, oname, nsmp)
+		assert rwrepo.submodule(oname).exists()
 		
 		# it will just return successfully as a submodule with that name
 		# already exists
 		psm(SubmoduleCmd.k_add, nsmn, nsmp, sm.url)
 		
 		
-		
 		# MOVE
 		######
+		# not enough args
+		self.failUnlessRaises(OptParseError, psm, SubmoduleCmd.k_move, "name")
 		
+		# move previously created module 
+		nsm = rwrepo.submodule(nsmn)
+		assert nsm.module_exists()
+		assert nsm.path == nsmp
+		nsmp += "_moved"
+		psm(SubmoduleCmd.k_move, nsm.name, nsmp)
+		assert not nsm.module_exists()			# it was moved, our instance is not uptodate
 		
 		
 		# REMOVE

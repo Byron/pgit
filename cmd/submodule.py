@@ -1,7 +1,12 @@
 """Implements the submodule pgit command"""
 from base import CmdBase
 
-from git import RootModule
+from git import (
+					Submodule,
+					RootModule
+				)
+
+from optparse import OptionGroup
 
 __all__ = ['SubmoduleCmd']
 
@@ -30,14 +35,29 @@ class SubmoduleCmd(CmdBase):
 	def option_parser(self):
 		parser = super(SubmoduleCmd, self).option_parser()
 		
+		group = OptionGroup(parser, "Update Options")
+		
 		hlp = """If set, updates will not be handled recursively, but instead only
 affect the direct submodules of the curent repository. This usually causes inconsistent
 checkouts as children of said submodules might require an update too"""
-		parser.add_option('--non-recursive' , action='store_true', help=hlp)
+		group.add_option('--non-recursive' , action='store_true', help=hlp)
 		
 		hlp = """If set, the sha of the submodule will be ignored. Instead, the
 submodule's repository will be updated to the latest available revision"""
-		parser.add_option('-l', '--to-latest-revision', action='store_true', help=hlp)
+		group.add_option('-l', '--to-latest-revision', action='store_true', help=hlp)
+		parser.add_option_group(group)
+		
+		
+		group = OptionGroup(parser, "Add Options")
+		hlp = "Specify a tracking branch to use if it is not 'master', which is the default"
+		group.add_option('-b', '--branch', help=hlp)
+		
+		hlp = """If set, the new submodule's repository will be cloned, but not checkedout, i.e.
+the working tree is empty"""
+		group.add_option('--no-checkout', action='store_true', default=False, help=hlp)
+		
+		parser.add_option_group(group)
+		
 		
 		return parser
 	
@@ -52,11 +72,11 @@ submodule's repository will be updated to the latest available revision"""
 		if cmd == self.k_query:
 			self._exec_query(options, args)
 		elif cmd == self.k_add:
-			pass
+			self._exec_add(options, args)
 		elif cmd == self.k_remove:
-			pass
+			self._exec_remove(options, args)
 		elif cmd == self.k_move:
-			pass
+			self._exec_move(options, args)
 		elif cmd == self.k_update:
 			self._exec_update(options, args)
 		else:
@@ -113,5 +133,20 @@ submodule's repository will be updated to the latest available revision"""
 				# END if name matches filter
 			# END for each submodule
 		# END handle filter
+	
+	def _exec_add(self, options, args):
+		"""Add a new submodule. The last arg may be the url, which is optional"""
+		if len(args) < 2 or len(args) > 3:
+			raise self.parser.error("arguments may be: name path [url]")
+		# END handle arg count
+		
+		sm = Submodule.add(self.repo, *args, branch=options.branch, no_checkout=options.no_checkout)
+		print "Created submodule %r at path %s" % (sm.name, sm.path)
+		
+	def _exec_move(self, options, args):
+		raise NotImplementedError("todo")
+		
+	def _exec_remove(self, options, args):
+		raise NotImplementedError("todo")
 	
 	#} END handlers

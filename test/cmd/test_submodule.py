@@ -12,4 +12,4 @@ class TestSubmoduleCmd(TestCmdBase):
 		
 		# no args prints a one-line-per-submodule summary
 		out = psm()
-		assert len(out) == 1
+		assert out

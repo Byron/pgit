@@ -1,6 +1,7 @@
 """Provide base classes for the test system"""
 from test.testlib import TestBase
 import git.cmd
+from git import Repo
 
 import os
 import sys
@@ -26,6 +27,17 @@ class TestCmdBase(TestBase):
 	# Must be a tuple
 	k_add_args = tuple()
 	#} END configuration
+	
+	#{ Overrides
+	@classmethod
+	def setUpAll(cls):
+		"""Fix the read-only repo to use ours instead"""
+		super(TestCmdBase, cls).setUpAll()
+		cls.rorepo = Repo(os.path.dirname(__file__))
+		
+	#END overrides
+	
+	#{ Interface
 	
 	def cmd(self, *args, **kwargs):
 		""":return: Instance of your spawned command t_cmd which was provided with
@@ -81,3 +93,4 @@ class TestCmdBase(TestBase):
 		args = self.k_add_args + args
 		return self.t_cmd.spawn(*args, **_kwargs)
 			
+	#} END interface

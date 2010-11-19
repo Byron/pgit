@@ -1,0 +1,34 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import sys
+import os
+
+#{ Initialization
+
+def import_mrv_program():
+	"""Fake-import everything that is available in the mrv program"""
+	# we assume to be launched using a relative path 
+	osd = os.path.dirname
+	mrvpath = os.path.join(osd(osd(os.path.abspath(__file__))), 'ext', 'mrv', 'bin', 'mrv')
+	globals()['__name__'] = "prevent execution of main"
+	globals()['__file__'] = mrvpath
+	
+	try:
+		execfile(mrvpath, globals())
+	except Exception, e:
+		raise EnvironmentError("Could not execute mrv program at %r with error %s" % (mrvpath, e))
+	# END exception handling
+	
+def main(args):
+	import_mrv_program()
+	
+	# for now, just launch mrv
+	args_mod = lambda a, v, m, i: ('-c', 'import mrv.cmd.spcmd as spc; import sys; spc.main(sys.argv[1:])', 
+										'pgit.cmd.submodule.SubmoduleCmd') + a
+	mrvmain(['--mrv-no-maya'] + args, args_modifier=args_mod)
+
+#} END initialiation
+
+if __name__ == '__main__':
+	main(sys.argv[1:])

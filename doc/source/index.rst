@@ -5,11 +5,15 @@
 
 Welcome to pgit's documentation!
 ================================
+**pgit** ('pee-git') is a git command-line interface written in python. It aims to fix shortcomings and convenience issues arising with the traditional c-git implementation, but does for now not strive to be feature-complete.
 
 Contents:
 
 .. toctree::
    :maxdepth: 2
+   
+   cmd/submodule
+   changes
 
 Indices and tables
 ==================

@@ -27,7 +27,7 @@ def import_mrv_program():
 		try:
 			import pgit
 			import mrv.cmd.spcmd as spc; 
-			spc.main(tuple(sys.argv[1:]) + (_cmd_arg, ))
+			spc.main([_cmd_arg] + sys.argv[1:])
 			sys.exit(0)
 		except ImportError:
 			raise EnvironmentError("Could not execute mrv program at %r with error %s" % (mrvpath, e))

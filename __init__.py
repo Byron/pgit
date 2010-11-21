@@ -5,7 +5,7 @@ import sys
 def init_externals():
 	"""Adjust system path to allow access to our externals"""
 	ext_path = os.path.join(os.path.dirname(__file__), 'ext')
-	sys.path.append(ext_path)
+	sys.path.insert(0, ext_path)
 	
 	try:
 		import mrv

@@ -141,11 +141,12 @@ the working tree is empty"""
 			print "\tbranch: %s" % sm.branch.name
 			if sm.module_exists():
 				mhead = sm.module().head
-				fmt = "\thead  :%s"
+				fmt = "\thead  : %s"
 				if mhead.is_detached:
 					msg = (fmt % mhead.commit) + " (detached)"
 				else:
-					msg = (fmt % mhead.ref) + (mhead.ref.tracking_branch() is not None and " (tracking)") or '' 
+					msg = (fmt % mhead.ref) + ((mhead.ref.tracking_branch() is not None and " (tracking %s)" % mhead.ref.tracking_branch().name) or '')
+				print msg
 			#END handle module
 		#END output each submodule
 	

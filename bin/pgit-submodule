@@ -4,6 +4,9 @@
 import sys
 import os
 
+_start_cmd = 'import mrv.cmd.spcmd as spc; import sys; spc.main(sys.argv[1:])'
+_cmd_arg = 'pgit.cmd.submodule.SubmoduleCmd'
+
 #{ Initialization
 
 def import_mrv_program():
@@ -17,15 +20,24 @@ def import_mrv_program():
 	try:
 		execfile(mrvpath, globals())
 	except Exception, e:
-		raise EnvironmentError("Could not execute mrv program at %r with error %s" % (mrvpath, e))
+		# this only works if we are within our cloned diretory structure. Now we 
+		# assume we have been installed and start the spawned command directly
+		# NOTE: This is more like a hack, and MUST be generalized as soon as 
+		# we get another command
+		try:
+			import pgit
+			import mrv.cmd.spcmd as spc; 
+			spc.main(tuple(sys.argv[1:]) + (_cmd_arg, ))
+			sys.exit(0)
+		except ImportError:
+			raise EnvironmentError("Could not execute mrv program at %r with error %s" % (mrvpath, e))
 	# END exception handling
 	
 def main(args):
 	import_mrv_program()
 	
 	# for now, just launch mrv
-	args_mod = lambda a, v, m, i: ('-c', 'import mrv.cmd.spcmd as spc; import sys; spc.main(sys.argv[1:])', 
-										'pgit.cmd.submodule.SubmoduleCmd') + a
+	args_mod = lambda a, v, m, i: ('-c', _start_cmd, _cmd_arg) + a
 	mrvmain(['--mrv-no-maya'] + args, args_modifier=args_mod)
 
 #} END initialiation

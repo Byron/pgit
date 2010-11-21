@@ -26,7 +26,7 @@ setup_kwargs = dict(
 				package_data = {
 								'pgit' : [ 'bin'],
 								 },
-				requires=('GitPython (>=0.3.1)',),
+				requires=('gitpython (>=0.3.1)',),
 				options = dict()
 				)
 

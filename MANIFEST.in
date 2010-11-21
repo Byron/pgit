@@ -1,11 +1,27 @@
-prune ext
+graft ext
 
 graft bin
-graft doc/source
+graft doc/source/*
 prune doc/source/generated
 
 include AUTHORS
 include README.rst
+
+prune test
+
+# strip down the externals, especially mrv which is only used as a framework
+prune ext/git
+
+prune ext/mrv/test
+prune ext/mrv/maya
+prune ext/mrv/doc
+prune ext/mrv/ext
+prune ext/mrv/automation
+exclude ext/mrv/batch.py
+exclude ext/mrv/mdp.py
+exclude ext/mrv/mdepparse.py
+exclude ext/mrv/dgfe.py
+exclude ext/mrv/dge.py
 
 
 global-exclude .git*

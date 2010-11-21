@@ -25,30 +25,9 @@ setup_kwargs = dict(
 				scripts = ['bin/pgit-submodule'], 
 				package_data = {
 								'pgit' : [ 'bin'],
-								
-								# MRV
-								'pgit.ext.mrv' : ['bin', 'maya/cache'],
-								'pgit.ext.mrv.test' : ['bin', 'cmd', '!*test_*'],
-								
 								 },
-				requires=(	'GitPython (>=0.3.1)',
-							'mrv (>=1.0.1)'),
-
-				options = dict(build_py={	'exclude_from_compile' 	: ('*/maya/undo.py', '*/maya/nt/persistence.py'), 
-										'exclude_items' 			: ( 
-																		# MRV
-																		'mrv.doc',
-																		'mrv.test.maya.test_',
-																		'mrv.test.maya.automation',
-																		'mrv.test.maya.nt',
-																		'mrv.test.maya.performance',
-																		'mrv.test.maya.ui',
-																		'mrv.test.fixtures', 
-																		'mrv.test.automation',
-																		'mrv.test.test_',
-																		'mrv.test.cmd.test_',
-																		
-																	)} )
+				requires=('GitPython (>=0.3.1)',),
+				options = dict()
 				)
 
 

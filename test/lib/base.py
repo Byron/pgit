@@ -1,5 +1,5 @@
 """Provide base classes for the test system"""
-from test.testlib import TestBase
+from git.test.lib import TestBase
 import git.cmd
 from git import Repo
 

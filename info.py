@@ -27,6 +27,7 @@ setup_kwargs = dict(
 								'pgit' : [ 'bin'],
 								 },
 				requires=('gitpython (>=0.3.1)',),
+				install_requires='gitpython >= 0.3.1',
 				options = dict()
 				)
 

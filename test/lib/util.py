@@ -1,13 +1,11 @@
 """A diversity of utility functions"""
 
-from test.testlib import (
+from git.test.lib import (
 							with_rw_repo,
 							with_rw_and_rw_remote_repo
 						)
 
-import test.testlib.helper
-# apply monkeypatch so that it operates based on this file
-test.testlib.helper
+import git.test.lib.helper
 
 import os
 from git import Repo

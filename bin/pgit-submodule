@@ -15,7 +15,7 @@ def import_mrv_program():
 	osd = os.path.dirname
 	mrvpath = os.path.join(osd(osd(os.path.abspath(__file__))), 'ext', 'mrv', 'bin', 'mrv')
 	globals()['__name__'] = "prevent execution of main"
-	globals()['__file__'] = mrvpath
+	globals()['__file__'] = __file__
 	
 	try:
 		execfile(mrvpath, globals())

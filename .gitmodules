@@ -1,6 +1,6 @@
 [submodule "mrv"]
 	path = ext/mrv
-	url = git://gitorious.com/mrv/mainline.git
+	url = git://github.com/Byron/mrv.git
 [submodule "git"]
 	path = ext/git
 	url = git@github.com:Byron/GitPython.git

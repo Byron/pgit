@@ -37,14 +37,24 @@ By default, all submodules will be updated, but you may specify one or more subm
     
 
 The operation supports the following flags:
-    
-* .. cmdoption:: --no-recurse
 
- * Explicitly force the command not to update the whole hierarchy of modules, but only the intermediate submodules found in this repository.
- 
 * .. cmdoption:: --to-latest-revision (-l)
 
  * Instead of using the submodule's sha as hint to which revision to update the submodule's repository, update it the latest available revision in the remote repository.
+ 
+* .. cmdoption:: --base-commit
+
+ * Specifies the commit rev-spec to use (e.g. HEAD~1, ORIG_HEAD, HEAD@{1}) as basis for the comparison with the currently checked-out commit in the root-repository. From the difference of the commits the command determines the changes.
+ * ..note:: Its extremely important that the base-commit is correct, otherwise the computed differences might not accurately reflect the actual repository state. Although the end-point will be correct, the amount or the type of differences will be incorrect.
+ 
+* .. cmdoption:: --no-recurse
+
+ * Explicitly force the command not to update the whole hierarchy of modules, but only the intermediate submodules found in this repository.
+
+* .. cmdoption:: --dry-run (-n)
+
+ * If set, no change will be made. This allows to see in advance which steps would be performed during an update.
+
  
 
 ===
@@ -104,10 +114,10 @@ The following options may be specified:
 
  * If set, the submodule's repository will be deleted despite of user modifications.
  
- 
-* .. cmdoption:: --dry-run (-n)
+* .. cmdoption:: ---dry-run (-n)
 
  * If set, no change will be made. This allows to see in advance if there would be any problems if a deletion would be attempted.
+ * *Note*: The first of the three dashes was just added to satisfy the documentation generator, the command needs only two of them.
  
 * .. cmdoption:: ---skip-configuration
 

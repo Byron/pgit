@@ -29,6 +29,9 @@ class TestSubmoduleCmd(TestCmdBase):
 		# invalid filter raises early
 		self.failUnlessRaises(ValueError, psm, SubmoduleCmd.k_update, "doesntexist")
 		
+		# dry-run does nothing
+		psm(SubmoduleCmd.k_update, '-n')
+		
 		# updates all without anything else
 		psm(SubmoduleCmd.k_update)
 		
@@ -76,6 +79,11 @@ class TestSubmoduleCmd(TestCmdBase):
 		
 		# remove both now submodules - same item multiple time will be fine
 		assert nsm.exists()
+		
+		# dry-run doesn't do anything
+		psm(SubmoduleCmd.k_remove, nsm.name, nsm.name, '--force', '--dry-run')
+		assert nsm.exists()
+		
 		psm(SubmoduleCmd.k_remove, nsm.name, nsm.name, '--force')
 		assert not nsm.exists()
 		

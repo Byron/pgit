@@ -9,7 +9,7 @@ REG_ARGS=--regression-tests=$(MAYA_VERSION)
 DOC_ARGS=--zip-archive --coverage=0 --sphinx-autogen=0 --epydoc=0
 SDIST=sdist
 
-
+MRV_INFO_DIR=$PWD
 
 PYTHON_SETUP=/usr/bin/python setup.py
 

@@ -22,7 +22,7 @@ nosetest_exec = 'ext/mrv/test/bin/tmrv'
 makedoc_exec = '../pgit/ext/mrv/doc/makedoc'
 
 setup_kwargs = dict(
-				scripts = ['bin/pgit-submodule'], 
+				scripts = ['pgit/bin/pgit-submodule'], 
 				package_data = {
 								'pgit' : [ 'bin'],
 								 },

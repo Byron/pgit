@@ -5,7 +5,8 @@ import sys
 def init_externals():
 	"""Adjust system path to allow access to our externals"""
 	ext_path = os.path.join(os.path.dirname(__file__), 'ext')
-	sys.path.insert(0, ext_path)
+	sys.path.insert(0, os.path.join(ext_path, 'mrv'))
+	sys.path.insert(0, os.path.join(ext_path, 'gitpython'))
 	
 	try:
 		import mrv

@@ -36,7 +36,7 @@ class TestSubmoduleCmd(TestCmdBase):
 		psm(SubmoduleCmd.k_update)
 		
 		# only update one, none-recursively, to the latest revision
-		psm(SubmoduleCmd.k_update, '--non-recursive', '-l', 'git')
+		psm(SubmoduleCmd.k_update, '--non-recursive', '-l', 'gitpython')
 		
 		# ADD
 		#####

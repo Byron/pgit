@@ -13,9 +13,8 @@ def import_mrv_program():
 	"""Fake-import everything that is available in the mrv program"""
 	# we assume to be launched using a relative path 
 	osd = os.path.dirname
-	mrvpath = os.path.join(osd(osd(os.path.abspath(__file__))), 'ext', 'mrv', 'bin', 'mrv')
+	mrvpath = os.path.join(osd(osd(os.path.abspath(__file__))), 'ext', 'mrv', 'mrv', 'bin', 'mrv')
 	globals()['__name__'] = "prevent execution of main"
-	globals()['__file__'] = __file__
 	
 	try:
 		execfile(mrvpath, globals())

@@ -17,12 +17,12 @@ license = "New BSD"
 src_commit_sha = '0'*40
 
 # paths to executables, relative to our project root
-regression_test_exec = 'ext/mrv/test/bin/tmrvr'
-nosetest_exec = 'ext/mrv/test/bin/tmrv'
-makedoc_exec = '../ext/mrv/doc/makedoc'
+regression_test_exec = 'pgit/ext/mrv/mrv/test/bin/tmrvr'
+nosetest_exec = 'pgit/ext/mrv/mrv/test/bin/tmrv'
+makedoc_exec = '../pgit/ext/mrv/doc/makedoc'
 
 setup_kwargs = dict(
-				scripts = ['bin/pgit-submodule'], 
+				scripts = ['pgit/bin/pgit-submodule'], 
 				package_data = {
 								'pgit' : [ 'bin'],
 								 },
@@ -35,8 +35,8 @@ setup_kwargs = dict(
 # Optionally taken into consideration by the DocGenerator implementation 
 doc_config = dict(
 				epydoc_show_source = 'no',
-				epydoc_modules = "modules: unittest\nmodules: ../",
-				epydoc_exclude = "%s.test,%s.doc" % (root_package, root_package),
+				epydoc_modules = "modules: unittest\nmodules: ../pgit",
+				epydoc_exclude = "%s.test" % (root_package),
 				)
 
 #} END configuration

@@ -4,7 +4,8 @@ from base import CmdBase
 from git import (
 					Submodule,
 					RootModule,
-					RootUpdateProgress
+					RootUpdateProgress,
+					InvalidGitRepositoryError
 				)
 
 from optparse import OptionGroup
@@ -151,8 +152,8 @@ the working tree is empty"""
 			print '-' * len(title)
 			print "\tpath  : %s" % sm.path
 			print "\turl   : %s" % sm.url
-			print "\tbranch: %s" % sm.branch.name
-			if sm.module_exists():
+			print "\tbranch: %s" % sm.branch_name
+			try:
 				mhead = sm.module().head
 				fmt = "\thead  : %s"
 				if mhead.is_detached:
@@ -160,7 +161,9 @@ the working tree is empty"""
 				else:
 					msg = (fmt % mhead.ref) + ((mhead.ref.tracking_branch() is not None and " (tracking %s)" % mhead.ref.tracking_branch().name) or '')
 				print msg
-			#END handle module
+			except InvalidGitRepositoryError:
+				print "\t(Repository not checked out)"
+			#END ignore missing repos
 		#END output each submodule
 	
 	def _exec_update(self, options, args):

@@ -24,7 +24,7 @@ makedoc_exec = '../pgit/ext/mrv/doc/makedoc'
 setup_kwargs = dict(
 				scripts = ['pgit/bin/pgit-submodule'], 
 				package_data = {
-								'pgit' : ['bin'],
+								'pgit' : ['bin/*'],
 								 },
 				requires=('gitpython (>=0.3.1)',),
 				install_requires='gitpython >= 0.3.1',

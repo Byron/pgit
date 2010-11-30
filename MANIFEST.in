@@ -13,7 +13,6 @@ prune pgit/ext/gitpython
 
 
 prune pgit/ext/mrv/doc
-exclude pgit/ext/mrv/setup.py
 exclude pgit/ext/mrv/pylint.rc
 exclude pgit/ext/mrv/makefile
 exclude pgit/ext/mrv/MANIFEST.in

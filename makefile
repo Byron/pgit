@@ -18,6 +18,7 @@ all:
 clean:
 	$(PYTHON_SETUP) clean --all
 	$$(cd doc; ../pgit/ext/mrv/doc/makedoc --clean --package=pgit)
+	-rm MANIFEST 2>>/dev/null
 	
 docs:
 	$(PYTHON_SETUP) $(PYVERSION_ARGS) docdist $(DOC_ARGS) 

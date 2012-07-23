@@ -20,7 +20,7 @@ def init_externals():
 		if not hasattr(git, 'RootModule'):
 			raise ImportError("Git's version didn't provide the RootModule")
 	except ImportError, e:
-		raise EnvironmentError("Could not import git, or it was not providing the RootModule type")
+		raise EnvironmentError("Could not import git: %s" % str(e))
 	#END handle exception
 		
 

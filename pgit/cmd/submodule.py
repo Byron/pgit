@@ -185,17 +185,21 @@ the working tree is empty"""
 						dry_run=options.dry_run,
 						progress=progress
 					)
-		
-		if not args:
-			RootModule(self.repo).update(**kwargs)
-		else:
-			# only updated specific modules .. smartly,but not based on our root
-			for sm in sms:
-				if sm.name in args and sm.module_exists():
-					RootModule(sm.module()).update(**kwargs)
-				# END if name matches filter
-			# END for each submodule
-		# END handle filter
+		try:
+			if not args:
+				RootModule(self.repo).update(**kwargs)
+			else:
+				# only updated specific modules .. smartly,but not based on our root
+				for sm in sms:
+					if sm.name in args and sm.module_exists():
+						RootModule(sm.module()).update(**kwargs)
+					# END if name matches filter
+				# END for each submodule
+			# END handle filter
+		except Exception:
+			self.log.error("Unhandle exception cought", exc_info=True)
+			raise Exception("An unhandled exception occurred")
+		#END exception handling 
 	
 	def _exec_add(self, options, args):
 		"""Add a new submodule. The last arg may be the url, which is optional"""

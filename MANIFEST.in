@@ -9,8 +9,8 @@ include README.rst
 prune pgit/test
 
 # strip down the externals, especially mrv which is only used as a framework
-prune pgit/ext/gitpython
-
+prune pgit/ext/gitpython/doc
+prune pgit/ext/gitpython/git/test
 
 prune pgit/ext/mrv/doc
 exclude pgit/ext/mrv/pylint.rc

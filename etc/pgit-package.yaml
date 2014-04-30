@@ -2,6 +2,16 @@ packages:
   #########
   pgit: ##
   #######
+    name: pgit executable
+    requires: pgit-package
+    alias: python
+    arguments:
+      prepend:
+        - -c
+        - import pgit.cmd; pgit.cmd.main()
+  #################
+  pgit-package: ##
+  ###############
     # This is the executable configuration
     # NOTE: This package requires it's tree to be set, which is done in the distribution
     name: pgit
@@ -9,7 +19,6 @@ packages:
       Besides the name being funny, pgit wants to become a fully usable 
       git command-line implementation in python one day.
     url: https://github.com/Byron/pgit
-    alias: python
     requires:
       # these requirements are to be defined in the distribution
       - python
@@ -18,7 +27,3 @@ packages:
     environment:
       variables:
         PYTHONPATH: src/python
-    arguments:
-      prepend:
-        - -c
-        - import pgit.cmd; pgit.cmd.main()

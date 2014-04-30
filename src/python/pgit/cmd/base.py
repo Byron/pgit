@@ -1,4 +1,13 @@
-"""Provides base types that should be used by all pgit commands"""
+#-*-coding:utf-8-*-
+"""
+@package pgit.cmd.base
+@brief Provides base types that should be used by all pgit commands
+
+@author Sebastian Thiel
+@copyright [GNU Lesser General Public License](https://www.gnu.org/licenses/lgpl.html)
+"""
+__all__ = ['CmdBase']
+
 from mrv.cmd.base import SpawnedCommand
 
 from git import Repo

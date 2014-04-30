@@ -1,3 +1,14 @@
+#-*-coding:utf-8-*-
+"""
+@package pgit.test.test_submodule
+@brief tests for pgit.cmd.submodule
+
+@author Sebastian Thiel
+@copyright [GNU Lesser General Public License](https://www.gnu.org/licenses/lgpl.html)
+"""
+__all__ = []
+
+
 from pgit.test.lib import *
 
 from pgit.cmd.submodule import *

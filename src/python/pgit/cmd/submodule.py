@@ -1,12 +1,19 @@
-"""Implements the submodule pgit command"""
+#-*-coding:utf-8-*-
+"""
+@package pgit.cmd.submodule
+@brief Implements the submodule pgit command
+
+@author Sebastian Thiel
+@copyright [GNU Lesser General Public License](https://www.gnu.org/licenses/lgpl.html)
+"""
+__all__ = ['UpdateProgress', 'SubmoduleCmd']
+
 from base import CmdBase
 
-from git import (
-					Submodule,
-					RootModule,
-					RootUpdateProgress,
-					InvalidGitRepositoryError
-				)
+from git import ( Submodule,
+				  RootModule,
+				  RootUpdateProgress,
+				  InvalidGitRepositoryError )
 
 from optparse import OptionGroup
 

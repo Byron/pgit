@@ -1,8 +1,0 @@
-[submodule "mrv"]
-	path = pgit/ext/mrv
-	url = http://github.com/mrv-developers/mrv.git 
-	branch = master
-[submodule "gitpython"]
-	path = pgit/ext/gitpython
-	url = http://github.com/gitpython-developers/GitPython.git
-	branch = master

@@ -19,10 +19,10 @@ __all__ = ['PGitCommand']
 #{Classes
 
 class PGitCommand(CommandBase):
-	"""Implements functinality common to all pgit commands
-	
-	We initialize a member called 'repo' which provides a Repo instance based on 
-	the current working directory"""
+    """Implements functinality common to all pgit commands
+    
+    We initialize a member called 'repo' which provides a Repo instance based on 
+    the current working directory"""
 
     # -------------------------
     ## @name Configuration

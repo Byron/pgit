@@ -6,5 +6,8 @@
 @author Sebastian Thiel
 @copyright [GNU Lesser General Public License](https://www.gnu.org/licenses/lgpl.html)
 """
-__all__ = []
+from __future__ import absolute_import
+
+from .cmd import PGitCommand
+__version__ = PGitCommand.version
 

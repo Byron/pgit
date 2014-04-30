@@ -6,27 +6,64 @@
 @author Sebastian Thiel
 @copyright [GNU Lesser General Public License](https://www.gnu.org/licenses/lgpl.html)
 """
-__all__ = ['CmdBase']
+__all__ = ['PGitCommand', 'PGitSubCommand']
 
-from mrv.cmd.base import SpawnedCommand
+from bcmd import CommandBase
+from butility import Version
 
 from git import Repo
 import os
 
-__all__ = ['CmdBase']
+__all__ = ['PGitCommand']
 
 #{Classes
 
-class CmdBase(SpawnedCommand):
+class PGitCommand(CommandBase):
 	"""Implements functinality common to all pgit commands
 	
 	We initialize a member called 'repo' which provides a Repo instance based on 
 	the current working directory"""
 
-	def __init__(self, *args, **kwargs):
-		super(CmdBase, self).__init__(*args, **kwargs)
-		
-		self.repo = Repo(os.getcwd())
-	
+    # -------------------------
+    ## @name Configuration
+    # @{
+
+    ## Name of our program
+    name = 'pgit'
+    ## A version string
+    version = Version('0.1.0')
+    ## command description
+    description = "The main pgit command - functionality comes in with subcommands"
+    
+    ## -- End Configuration -- @}
 
 #}END classes
+
+
+class PGitSubCommand(PGitCommand):
+    """A pgit subcommand should derive from this type, setting its name member accordingly"""
+
+    # -------------------------
+    ## @name Configuration
+    # @{
+
+    main_command_name = PGitCommand.name
+    
+    ## -- End Configuration -- @}
+
+
+    # -------------------------
+    ## @name Subclass Overrides
+    # @{
+
+    ## To be set by subclass
+    name = None
+    
+    ## -- End Subclass Overrides -- @}
+    
+
+    def __init__(self, *args, **kwargs):
+        super(PGitSubCommand, self).__init__(*args, **kwargs)
+        self.repo = Repo(os.getcwd())
+
+# end class PGitSubCommand

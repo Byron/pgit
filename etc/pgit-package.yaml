@@ -8,7 +8,7 @@ packages:
     arguments:
       prepend:
         - -c
-        - import pgit.cmd; pgit.cmd.main()
+        - import pgit; pgit.PGitCommand.main()
   #################
   pgit-package: ##
   ###############

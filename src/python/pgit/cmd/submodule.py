@@ -6,18 +6,18 @@
 @author Sebastian Thiel
 @copyright [GNU Lesser General Public License](https://www.gnu.org/licenses/lgpl.html)
 """
-__all__ = ['UpdateProgress', 'SubmoduleCmd']
+__all__ = ['UpdateProgress', 'SubmoduleCommand']
 
-from base import CmdBase
+import bapp
+from .base import PGitSubCommand
 
 from git import ( Submodule,
 				  RootModule,
 				  RootUpdateProgress,
 				  InvalidGitRepositoryError )
 
-from optparse import OptionGroup
+__all__ = ['SubmoduleCommand']
 
-__all__ = ['SubmoduleCmd']
 
 class UpdateProgress(RootUpdateProgress):
 	"""Prints all messages to stdout"""
@@ -25,30 +25,41 @@ class UpdateProgress(RootUpdateProgress):
 		print message
 	
 
-class SubmoduleCmd(CmdBase):
+class SubmoduleCommand(PGitSubCommand, bapp.plugin_type()):
 	"""Provides a CLI for the git-python submodule implementation"""
-	#{ Configuration 
-	k_class_path = "pgit.cmd.submodule.SubmoduleCmd"
-	k_log_application_id = None	# no own logging supported
+	# -------------------------
+	## @name Configuration
+	# @{
 	
-	k_program_name = 'pgit-submodule'
-	k_version = "1.0"
-	k_usage = '%prog operation [flags]'
-	k_description = """Edit or query a git-repository's submodules"""
-	#} END configuration
+	name = 'submodule'
+	version = "1.0"
+	description = "Edit or query a git-repository's submodules"
+
+	## -- End Configuration -- @}
+
+	# -------------------------
+	## @name Constants
+	# @{
 	
-	#{Constants
 	k_query = 'query'
 	k_add = 'add'
 	k_remove = 'remove'
 	k_move = 'move'
 	k_update = 'update'
-	#}END constants
-	
-	#{ Base Implementation
-	
+
+	## -- End Constants -- @}
+
+
+	# -------------------------
+	## @name Base Implementation
+	# @{
+
+	def setup_argparser(self, parser):
+        """Default implementation adds nothing. This is common if you use subcommands primarily"""
+        return self
+        
 	def option_parser(self):
-		parser = super(SubmoduleCmd, self).option_parser()
+		parser = super(SubmoduleCommand, self).option_parser()
 		
 		# UPDATE
 		########
@@ -118,38 +129,33 @@ the working tree is empty"""
 		group.add_option("-n", "--dry-run", action='store_true', default=False, help=hlp)
 		
 		parser.add_option_group(group)
-		
-		
-		
+
 		return parser
+
+	## -- End Base Implementation -- @}
 	
-	def execute(self, options, args):
+	def execute(self, args, remaining_args):
 		"""Perform the requested operation"""
-		cmd = 'query'
-		if args:
-			cmd = args[0]
-			args = args[1:]
-		# END handle command parsing
+		cmd = args.mode
 		
 		if cmd == self.k_query:
-			self._exec_query(options, args)
+			self._exec_query(args)
 		elif cmd == self.k_add:
-			self._exec_add(options, args)
+			self._exec_add(args)
 		elif cmd == self.k_remove:
-			self._exec_remove(options, args)
+			self._exec_remove(args)
 		elif cmd == self.k_move:
-			self._exec_move(options, args)
+			self._exec_move(args)
 		elif cmd == self.k_update:
-			self._exec_update(options, args)
+			self._exec_update(args)
 		else:
 			raise self.parser.error("Invalid operation: %r" % cmd)
 		#END handle operation
 		
-	#} END base implementation
 	
 	
 	#{ Handlers
-	def _exec_query(self, options, args):
+	def _exec_query(self, args):
 		"""Provide git-submodule like information, but include more information 
 		about whether we are tracking anything or not"""
 		# 7dd618655c96ff32b5c30e41a5406c512bcbb65f ext/git (0.1.4-586-g7dd6186)

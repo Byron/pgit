@@ -10,6 +10,7 @@ __all__ = ['UpdateProgress', 'SubmoduleCommand']
 
 import bapp
 from butility import Version
+from bcmd import ArgumentError
 
 from .base import PGitSubCommand
 
@@ -179,22 +180,16 @@ to be compared against the currently checked-out commit. Otherwise it defaults t
         """Perform the requested operation"""
         cmd = args.operation
         
-        if cmd == self.OP_QUERY:
-            self._exec_query(args)
-        elif cmd == self.OP_ADD:
-            self._exec_add(args)
-        elif cmd == self.OP_REMOVE:
-            self._exec_remove(args)
-        elif cmd == self.OP_MOVE:
-            self._exec_move(args)
-        elif cmd == self.OP_UPDATE:
-            self._exec_update(args)
-        else:
-            raise self.parser.error("Invalid operation: %r" % cmd)
+        try:
+            {self.OP_QUERY : self._exec_query,
+             self.OP_ADD   : self._exec_add,
+             self.OP_REMOVE: self._exec_remove,
+             self.OP_MOVE  : self._exec_move,
+             self.OP_UPDATE: self._exec_update}[cmd](args)
+        except KeyError:
+            raise ArgumentError("Invalid operation: %r" % cmd)
         #END handle operation
         
-    
-    
     #{ Handlers
     def _exec_query(self, args):
         """Provide git-submodule like information, but include more information 

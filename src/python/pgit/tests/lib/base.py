@@ -2,6 +2,7 @@
 import bapp
 
 from butility.tests import TestCaseBase
+from bapp.tests import with_application
 import git.cmd
 from git import Repo
 
@@ -11,7 +12,7 @@ import os
 import sys
 import cStringIO
 
-__all__ = ['TestCmdBase']
+__all__ = ['TestCmdBase', 'with_application']
 
 
 class TestCmdBase(TestCaseBase):

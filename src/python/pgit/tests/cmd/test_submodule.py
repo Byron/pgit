@@ -1,6 +1,6 @@
 #-*-coding:utf-8-*-
 """
-@package pgit.test.cmd.test_submodule
+@package pgit.tests.cmd.test_submodule
 @brief tests for pgit.cmd.submodule
 
 @author Sebastian Thiel
@@ -8,11 +8,15 @@
 """
 __all__ = []
 
-from bapp.tests import with_application
-from pgit.test.lib import *
+from bcmd import InputError
+
+from ..lib import with_application
+from pgit.tests.lib import *
 from pgit.cmd.submodule import *
 
 class TestSubmoduleCmd(TestCmdBase):
+
+    k_add_args = ('submodule',)
     
     @with_application
     @with_rw_repo_cmd('HEAD', bare=False)
@@ -25,18 +29,16 @@ class TestSubmoduleCmd(TestCmdBase):
         #######
         # invalid command raises
         # self.failUnlessRaises(str, psm, ['somecommand'])
-        
-        # no args prints a one-line-per-submodule summary
-        out = psm()
-        assert out
-        
-        # query is default mode
-        assert psm() == psm(SubmoduleCmd.k_query)
-        
+
+        # simple query - we have no submodules
+        out = psm('query')
+        # assert not out
+
         # UPDATE
         ########
         # invalid filter raises early
-        self.failUnlessRaises(ValueError, psm, SubmoduleCmd.k_update, "doesntexist")
+        print psm(SubmoduleCommand.OP_UPDATE, "doesntexist")
+        assert psm(SubmoduleCommand.OP_UPDATE, "doesntexist") == SubmoduleCommand.ARGUMENT_ERROR
         
         # dry-run does nothing
         psm(SubmoduleCmd.k_update, '-n')

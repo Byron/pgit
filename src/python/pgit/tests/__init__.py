@@ -1,6 +1,6 @@
 #-*-coding:utf-8-*-
 """
-@package pgit.test
+@package pgit.tests
 @brief pgit test suite
 
 @author Sebastian Thiel

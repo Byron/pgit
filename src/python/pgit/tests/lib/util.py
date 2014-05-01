@@ -1,17 +1,21 @@
-"""A diversity of utility functions"""
+#-*-coding:utf-8-*-
+"""
+@package pgit.tests.lib.util
+@brief A diversity of utility functions
 
-from git.test.lib import (
-                            with_rw_repo,
-                            with_rw_and_rw_remote_repo
-                        )
+@author Sebastian Thiel
+@copyright [GNU Lesser General Public License](https://www.gnu.org/licenses/lgpl.html)
+"""
+__all__ = ['with_rw_repo', 'with_rw_and_rw_remote_repo', 'with_rw_repo_cmd']
+
+from git.test.lib import ( with_rw_repo,
+                           with_rw_and_rw_remote_repo )
 
 import git.test.lib.helper
 
 import os
 from git import Repo
 from git.util import join_path
-
-__all__ = ['with_rw_repo', 'with_rw_and_rw_remote_repo', 'with_rw_repo_cmd']
 
 #{ Utilities
 

@@ -10,7 +10,7 @@ __all__ = ['UpdateProgress', 'SubmoduleCommand']
 
 import bapp
 from butility import Version
-from bcmd import ArgumentError
+from bcmd import InputError
 
 from .base import PGitSubCommand
 
@@ -199,7 +199,7 @@ repository if it contains any user modifications"
              self.OP_MOVE  : self._exec_move,
              self.OP_UPDATE: self._exec_update}[cmd](args)
         except KeyError:
-            raise ArgumentError("Invalid operation: %r" % cmd)
+            raise InputError("Invalid operation: %r" % cmd)
         #END handle operation
         
     #{ Handlers
@@ -234,7 +234,7 @@ repository if it contains any user modifications"
         if names:
             ssms = set(sm.name for sm in sms)
             if len(ssms & names) != len(names):
-                raise ValueError("Couldn't find the following submodule's for update: %s" % ", ".join(names - ssms))
+                raise InputError("Couldn't find the following submodule's for update: %s" % ", ".join(names - ssms))
             #END issue error
         # END pre-check existance of submodules
         progress = UpdateProgress(log=self.log())

@@ -49,9 +49,6 @@ def localize_submodules(repo, source_repo, recursive=True):
     # our submodules changed, commit the change to 'fix' it
     repo.index.add(sms)
     repo.index.commit("Committing submodule changes")
-    
-    
-    
 
 #} END utilities
 

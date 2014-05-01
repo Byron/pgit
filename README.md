@@ -12,13 +12,21 @@ At this point, there is no guarantee that pgit will ever be as full-featured as 
 
 Both frameworks are contained in the ext/ directory and are setup as git-submodule.
 
-### Install
+### Installation
 
 For installation, please have a look at the [pgit distribution repository](https://github.com/Byron/pgit-distro).
+
+### Commands
+
+Please find a listing of all currently available commands below.
+
+* pgit [submodule](https://github.com/Byron/pgit/blob/master/src/md/submodule.md)
 
 ### Development Status
 
 This project currently evolves only when I need a special purpose command that isn't easily achieved through the git commandline.
+
+Therefore it, or its main dependency, git-python, will attention sporadically.
 
 ### MAILING LIST
 http://groups.google.com/group/git-python

@@ -24,7 +24,7 @@ __all__ = ['SubmoduleCommand']
 class UpdateProgress(RootUpdateProgress):
     """Prints all messages to stdout"""
     def update(self, op, index, max_index, message):
-        print message
+        log.info(message)
     
 
 class SubmoduleCommand(PGitSubCommand, bapp.plugin_type()):
@@ -131,7 +131,12 @@ to be compared against the currently checked-out commit. Otherwise it defaults t
         help  = "The submodule's repository will not be moved, "
         help += "only the submodule's configuration will be altered."
         sp.add_argument('--skip-module', action='store_true', default=False, help=help)
-        
+
+        help = "The name of the submodule to move"
+        sp.add_argument('name', help=help)
+
+        help = "A path relative to your parent repository root to which to move the submodule"
+        sp.add_argument('destination_path', help=help)
         
         # REMOVE
         ########
@@ -240,16 +245,12 @@ to be compared against the currently checked-out commit. Otherwise it defaults t
     def _exec_add(self, args):
         """Add a new submodule. The last arg may be the url, which is optional"""
         sm = Submodule.add(self.repo, args.name, args.path, args.url, branch=args.branch, no_checkout=args.no_checkout)
-        print "Created submodule %r at path %s" % (sm.name, sm.path)
+        self.log().info("Created submodule %r at path %s", sm.name, sm.path)
         
-    def _exec_move(self, options, args):
-        if len(args) != 2:
-            raise self.parser.error("arguments must be: name destination_path")
-            
-        name, destpath = args
-        sm = self.repo.submodule(name)
-        sm.move(destpath, configuration=not options.skip_configuration, module=not options.skip_module)
-        print "Successfully moved the repository of submodule %r to %s" % (sm.name, sm.path)
+    def _exec_move(self, args):
+        sm = self.repo.submodule(args.name)
+        sm.move(args.destination_path, configuration=not args.skip_configuration, module=not args.skip_module)
+        self.log().info("Successfully moved the repository of submodule %r to %s", sm.name, sm.path)
         
     def _exec_remove(self, args):
         for sm in self.repo.submodules:

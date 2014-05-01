@@ -22,9 +22,14 @@ __all__ = ['SubmoduleCommand']
 
 
 class UpdateProgress(RootUpdateProgress):
-    """Prints all messages to stdout"""
+    """Prints all messages to stdout."""
+
+    def __init__(self, *args, **kwargs):
+        self.log = kwargs.pop('log')
+        super(UpdateProgress, self).__init__(*args, **kwargs)
+
     def update(self, op, index, max_index, message):
-        log.info(message)
+        self.log.info(message)
     
 
 class SubmoduleCommand(PGitSubCommand, bapp.plugin_type()):
@@ -49,7 +54,7 @@ class SubmoduleCommand(PGitSubCommand, bapp.plugin_type()):
     OP_ADD = 'add'
     OP_REMOVE = 'remove'
     OP_MOVE = 'move'
-    OP_MODIFY = 'modify'
+    OP_UPDATE = 'update'
 
     ## -- End Constants -- @}
 
@@ -76,7 +81,7 @@ class SubmoduleCommand(PGitSubCommand, bapp.plugin_type()):
         # UPDATE
         ########
         help = "Change an existing submodule"
-        sp = subparsers.add_parser(self.OP_MODIFY, description=help, help=help)
+        sp = subparsers.add_parser(self.OP_UPDATE, description=help, help=help)
 
 
         help = """If set, updates will not be handled recursively, but instead only
@@ -94,7 +99,11 @@ to be compared against the currently checked-out commit. Otherwise it defaults t
 
         help  = "If set, the operation will be simulated, but not actually performed, "
         help += "i.e. everything remains unchanged."
-        sp.add_argument("-n", "--dry-run", action='store_true', default=False, help=help)
+        sp.add_argument('-n', '--dry-run', action='store_true', default=False, help=help)
+
+        help  = "Optional submodules which should be updated selectively. If unset, "
+        help += "all submodules will be updated unconditionally"
+        sp.add_argument('names', nargs='*', metavar='submodule', help=help)
 
         
         # ADD
@@ -126,7 +135,7 @@ to be compared against the currently checked-out commit. Otherwise it defaults t
 
         help  = "Only the submodule's repository will be moved to the destination."
         help += "The configuration will remain unaltered, and is expected to point to the destination path already."
-        sp.add_argument("--skip-configuration", action='store_true', default=False, help=help)
+        sp.add_argument('--skip-configuration', action='store_true', default=False, help=help)
 
         help  = "The submodule's repository will not be moved, "
         help += "only the submodule's configuration will be altered."
@@ -144,11 +153,11 @@ to be compared against the currently checked-out commit. Otherwise it defaults t
         sp = subparsers.add_parser(self.OP_REMOVE, description=help, help=help)
         
         help = "If set, the submodule's repository will be removed even though it contains modifications"
-        sp.add_argument("--force", action='store_true', default=False, help=help)
+        sp.add_argument('--force', action='store_true', default=False, help=help)
 
         help  = "The submodule's configuration will not be removed, but only its repository."
         help += "The configuration will remain unaltered, and is expected to point to the destination path already."
-        sp.add_argument("--skip-configuration", action='store_true', default=False, help=help)
+        sp.add_argument('--skip-configuration', action='store_true', default=False, help=help)
 
         help  = "The submodule's repository will not be removed and remain on disk."
         help += "only the submodule's configuration will be altered."
@@ -156,7 +165,7 @@ to be compared against the currently checked-out commit. Otherwise it defaults t
 
         help  = "If set, the operation will be simulated, but not actually performed, "
         help += "i.e. everything remains unchanged."
-        sp.add_argument("-n", "--dry-run", action='store_true', default=False, help=help)
+        sp.add_argument('-n', '--dry-run', action='store_true', default=False, help=help)
 
         help = "One or more names of submodules to remove"
         sp.add_argument('names', nargs='+', help=help)
@@ -178,7 +187,7 @@ to be compared against the currently checked-out commit. Otherwise it defaults t
             self._exec_remove(args)
         elif cmd == self.OP_MOVE:
             self._exec_move(args)
-        elif cmd == self.OP_MODIFY:
+        elif cmd == self.OP_UPDATE:
             self._exec_update(args)
         else:
             raise self.parser.error("Invalid operation: %r" % cmd)
@@ -211,32 +220,30 @@ to be compared against the currently checked-out commit. Otherwise it defaults t
             #END ignore missing repos
         #END output each submodule
     
-    def _exec_update(self, options, args):
+    def _exec_update(self, args):
         """Update the submodules, we allow names of specific ones to be specified as additional args"""
-        args = set(args)
+        names = set(args.names)
         sms = self.repo.submodules
-        if args:
+        if names:
             ssms = set(sm.name for sm in sms)
-            if len(ssms & args) != len(args):
-                raise ValueError("Couldn't find the following submodule's for update: %s" % ", ".join(args - ssms))
+            if len(ssms & names) != len(names):
+                raise ValueError("Couldn't find the following submodule's for update: %s" % ", ".join(names - ssms))
             #END issue error
         # END pre-check existance of submodules
-        progress = UpdateProgress()
+        progress = UpdateProgress(log=self.log())
         
-        kwargs = dict(
-                        previous_commit = options.base_commit,
-                        recursive=not options.non_recursive,
-                        to_latest_revision=options.to_latest_revision,
-                        dry_run=options.dry_run,
-                        progress=progress
-                    )
+        kwargs = dict( previous_commit = args.base_commit,
+                       recursive=not args.non_recursive,
+                       to_latest_revision=args.to_latest_revision,
+                       dry_run=args.dry_run,
+                       progress=progress )
         
-        if not args:
+        if not names:
             RootModule(self.repo).update(**kwargs)
         else:
             # only updated specific modules .. smartly,but not based on our root
             for sm in sms:
-                if sm.name in args and sm.module_exists():
+                if sm.name in names and sm.module_exists():
                     RootModule(sm.module()).update(**kwargs)
                 # END if name matches filter
             # END for each submodule

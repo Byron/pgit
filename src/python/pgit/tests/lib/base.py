@@ -25,12 +25,10 @@ class TestCmdBase(TestCaseBase):
     danger of having it alter the environment of the current interpreter"""
     
     #{ Configuration
-    # Type of the command to test. It must be a subclass of BaseCmd
-    t_cmd = None
-    
-    # default arguments to add to the call prior to all passed in arguments
-    # Must be a tuple
-    k_add_args = tuple()
+
+    # The name of the sub-command to use
+    subcommand_name = None
+
     #} END configuration
     
     #{ Overrides
@@ -63,21 +61,22 @@ class TestCmdBase(TestCaseBase):
         prev_trace = git.cmd.Git.GIT_PYTHON_TRACE
         git.cmd.Git.GIT_PYTHON_TRACE = False
         return_stderr = kwargs.get('return_stderr', False)
-        fail_on_stderr = kwargs.get('fail_on_stderr', True)
+        fail_on_stderr = kwargs.get('fail_on_stderr', False)
         
         cmd = PGitCommand(application=bapp.main())
         
         try:
-            cmd.parse_and_execute(list(str(a) for a in self.k_add_args+args))
+            returncode = cmd.parse_and_execute(list(str(a) for a in (self.subcommand_name,) + args))
             err = sys.stderr.getvalue()
             if err and fail_on_stderr:
                 raise AssertionError("Command Failed: %s" % err)
+            # end handle errors right away, if requested
 
             out = sys.stdout.getvalue().splitlines()
             if return_stderr:
-                return out, err
+                return returncode, out, err
             else:
-                return out
+                return returncode, out
             # END handle
         finally:
             sys.stdout = sys.__stdout__

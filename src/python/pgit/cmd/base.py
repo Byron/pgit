@@ -8,7 +8,8 @@
 """
 __all__ = ['PGitCommand', 'PGitSubCommand']
 
-from bcmd import CommandBase
+from bcmd import (CommandBase, 
+                  SubCommandBase)
 from butility import Version
 
 from git import Repo
@@ -34,13 +35,17 @@ class PGitCommand(CommandBase):
     version = Version('0.1.0')
     ## command description
     description = "The main pgit command - functionality comes in with subcommands"
-    
+
+
+    subcommands_title = 'Subcommands'
+    subcommands_help = 'Specify -h after a subcommand name for more information.'
+
     ## -- End Configuration -- @}
 
 #}END classes
 
 
-class PGitSubCommand(PGitCommand):
+class PGitSubCommand(SubCommandBase):
     """A pgit subcommand should derive from this type, setting its name member accordingly"""
 
     # -------------------------
@@ -51,19 +56,8 @@ class PGitSubCommand(PGitCommand):
     
     ## -- End Configuration -- @}
 
-
-    # -------------------------
-    ## @name Subclass Overrides
-    # @{
-
-    ## To be set by subclass
-    name = None
-    
-    ## -- End Subclass Overrides -- @}
-    
-
     def __init__(self, *args, **kwargs):
         super(PGitSubCommand, self).__init__(*args, **kwargs)
         self.repo = Repo(os.getcwd())
-
+        
 # end class PGitSubCommand

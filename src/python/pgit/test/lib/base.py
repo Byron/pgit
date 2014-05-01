@@ -1,7 +1,11 @@
 """Provide base classes for the test system"""
-from git.test.lib import TestBase
+import bapp
+
+from butility.tests import TestCaseBase
 import git.cmd
 from git import Repo
+
+from pgit import PGitCommand
 
 import os
 import sys
@@ -10,7 +14,7 @@ import cStringIO
 __all__ = ['TestCmdBase']
 
 
-class TestCmdBase(TestBase):
+class TestCmdBase(TestCaseBase):
     """Foundation class from which all command test should derive to obtain
     command-specific testing utilities.
     
@@ -30,9 +34,9 @@ class TestCmdBase(TestBase):
     
     #{ Overrides
     @classmethod
-    def setUpAll(cls):
+    def setUpClass(cls):
         """Fix the read-only repo to use ours instead"""
-        super(TestCmdBase, cls).setUpAll()
+        super(TestCmdBase, cls).setUpClass()
         cls.rorepo = Repo(os.path.dirname(__file__))
         
     #END overrides
@@ -40,28 +44,30 @@ class TestCmdBase(TestBase):
     #{ Interface
     
     def cmd(self, *args, **kwargs):
-        """:return: Instance of your spawned command t_cmd which was provided with
+        """:return: Instance of your spawned command cmd which was provided with
         the given arguments and executed.
+        If you are using this function, you must be sure to use the with_application decorator
         :param kwargs:
             * cwd: Current working dir to set for the duration of the command
             * return_stderr: if True, default False, stderr will be returned additionally
             * fail_on_stderr: if True, default True, we will fail with an 
               assertion error if the command outputs anything to stderr
         :return: list(linestdout,...) tuple(list(linestdout,...), list(linestderr,...))"""
-        assert self.t_cmd is not None, "t_cmd is not set"
         
         cur_dir = os.getcwd()
         os.chdir(kwargs.get('cwd', cur_dir))
         
         sys.stdout = cStringIO.StringIO()
         sys.stderr = cStringIO.StringIO()
-        prev_trace = git.cmd.GIT_PYTHON_TRACE
-        git.cmd.GIT_PYTHON_TRACE = False
+        prev_trace = git.cmd.Git.GIT_PYTHON_TRACE
+        git.cmd.Git.GIT_PYTHON_TRACE = False
         return_stderr = kwargs.get('return_stderr', False)
         fail_on_stderr = kwargs.get('fail_on_stderr', True)
         
+        cmd = PGitCommand(application=bapp.main())
+        
         try:
-            self.t_cmd()._execute(*(str(a) for a in self.k_add_args+args))
+            cmd.parse_and_execute(list(str(a) for a in self.k_add_args+args))
             err = sys.stderr.getvalue()
             if err and fail_on_stderr:
                 raise AssertionError("Command Failed: %s" % err)
@@ -75,22 +81,10 @@ class TestCmdBase(TestBase):
         finally:
             sys.stdout = sys.__stdout__
             sys.stderr = sys.__stderr__
-            git.cmd.GIT_PYTHON_TRACE=prev_trace
+            git.cmd.Git.GIT_PYTHON_TRACE=prev_trace
             os.chdir(cur_dir)
         # END handle default channels
         
-        return self.t_cmd()._execute(*args)
+        return cmd.parse_and_execute(args)
         
-    def scmd(self, *args, **kwargs):
-        """Spawn our command with the given *args. **kwargs can be used to configure
-        Subprocess.Popen. The output channels will be redirected into pipes which 
-        can be read accordingly.
-        :return: Started process instance
-        :param kwargs:
-            cwd: Current working directory"""
-        _kwargs = { 'stdout' : subprocess.PIPE, 'stderr' : subprocess.PIPE}
-        _kwargs.update(kwargs)
-        args = self.k_add_args + args
-        return self.t_cmd.spawn(*args, **_kwargs)
-            
     #} END interface

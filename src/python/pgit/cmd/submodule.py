@@ -9,6 +9,7 @@
 __all__ = ['UpdateProgress', 'SubmoduleCommand']
 
 import bapp
+from butility import Version
 from .base import PGitSubCommand
 
 from git import ( Submodule,
@@ -32,7 +33,7 @@ class SubmoduleCommand(PGitSubCommand, bapp.plugin_type()):
     # @{
     
     name = 'submodule'
-    version = "1.0"
+    version = Version('1.0')
     description = "Edit or query a git-repository's submodules"
 
     ## -- End Configuration -- @}
@@ -40,12 +41,14 @@ class SubmoduleCommand(PGitSubCommand, bapp.plugin_type()):
     # -------------------------
     ## @name Constants
     # @{
+
+    OPERATION = 'operation'
     
-    k_query = 'query'
-    k_add = 'add'
-    k_remove = 'remove'
-    k_move = 'move'
-    k_update = 'update'
+    OP_QUERY = 'query'
+    OP_ADD = 'add'
+    OP_REMOVE = 'remove'
+    OP_MOVE = 'move'
+    OP_MODIFY = 'modify'
 
     ## -- End Constants -- @}
 
@@ -56,97 +59,108 @@ class SubmoduleCommand(PGitSubCommand, bapp.plugin_type()):
 
     def setup_argparser(self, parser):
         """Default implementation adds nothing. This is common if you use subcommands primarily"""
-        return self
+        super(SubmoduleCommand, self).setup_argparser(parser)
+
+        subparsers = parser.add_subparsers(title='Operation',
+                                           dest=self.OPERATION,
+                                           description="An operation to perform on one or more submodules")
         
-    def option_parser(self):
-        parser = super(SubmoduleCommand, self).option_parser()
-        
+        # QUERY
+        ########
+        # This should be default, but we can't specify it. Fair enough
+        help = "List all submodule information"
+        sp = subparsers.add_parser(self.OP_QUERY, description=help, help=help)
+
+
         # UPDATE
         ########
-        group = OptionGroup(parser, "Update Options")
-        
-        hlp = """If set, updates will not be handled recursively, but instead only
+        help = "Change an existing submodule"
+        sp = subparsers.add_parser(self.OP_MODIFY, description=help, help=help)
+
+
+        help = """If set, updates will not be handled recursively, but instead only
 affect the direct submodules of the curent repository. This usually causes inconsistent
 checkouts as children of said submodules might require an update too"""
-        group.add_option('--non-recursive' , action='store_true', help=hlp)
+        sp.add_argument('--non-recursive', action='store_true', default=False, help=help)
         
-        hlp = """If set, the sha of the submodule will be ignored. Instead, the
+        help = """If set, the sha of the submodule will be ignored. Instead, the
 submodule's repository will be updated to the latest available revision"""
-        group.add_option('-l', '--to-latest-revision', action='store_true', help=hlp)
+        sp.add_argument('-l', '--to-latest-revision', action='store_true', help=help)
         
-        hlp = """If set, the given rev-spec defines the commit that should be used 
+        help = """If set, the given rev-spec defines the commit that should be used 
 to be compared against the currently checked-out commit. Otherwise it defaults to HEAD@{1}"""
-        group.add_option('--base-commit', default=None, help=hlp)
-        parser.add_option_group(group)
-        
-        
+        sp.add_argument('--base-commit', default=None, help=help)
+
+        help  = "If set, the operation will be simulated, but not actually performed, "
+        help += "i.e. everything remains unchanged."
+        sp.add_argument("-n", "--dry-run", action='store_true', default=False, help=help)
+
         
         # ADD
         ######
-        group = OptionGroup(parser, "Add Options")
-        hlp = "Specify a tracking branch to use if it is not 'master', which is the default"
-        group.add_option('-b', '--branch', help=hlp)
+        help = "add submodules to the current git repository"
+        sp = subparsers.add_parser(self.OP_ADD, description=help, help=help)
+
+        help = "Specify a tracking branch to use if it is not 'master', which is the default"
+        sp.add_argument('-b', '--branch', default='master', help=help)
         
-        hlp = """If set, the new submodule's repository will be cloned, but not checkedout, i.e.
-the working tree is empty"""
-        group.add_option('--no-checkout', action='store_true', default=False, help=hlp)
+        help  = "If set, the new submodule's repository will be cloned, but not checkedout,"
+        help += "i.e. the working tree is empty"
+        sp.add_argument('--no-checkout', action='store_true', default=False, help=help)
         
-        parser.add_option_group(group)
-        
-        
+
         # MOVE
         ######
-        group = OptionGroup(parser, "Move Options", "See Common Options")
-        
-        parser.add_option_group(group)
+        help = "move a submodule to a different directory"
+        sp = subparsers.add_parser(self.OP_MOVE, description=help, help=help)
+
+        help  = "Only the submodule's repository will be moved to the destination."
+        help += "The configuration will remain unaltered, and is expected to point to the destination path already."
+        sp.add_argument("--skip-configuration", action='store_true', default=False, help=help)
+
+        help  = "The submodule's repository will not be moved, "
+        help += "only the submodule's configuration will be altered."
+        sp.add_argument('--skip-module', action='store_true', default=False, help=help)
         
         
         # REMOVE
         ########
-        group = OptionGroup(parser, "Remove Options")
+        help = "remove a submodule entirely"
+        sp = subparsers.add_parser(self.OP_REMOVE, description=help, help=help)
         
-        hlp = "If set, the submodule's repository will be removed even though it contains modifications"
-        group.add_option("--force", action='store_true', default=False, help=hlp)
-        
-        parser.add_option_group(group)
-        
-        
-        # COMMON
-        ########
-        group = OptionGroup(parser, "Common Options")
-        
-        hlp  = "If set in remove mode, the submodule's configuration will not be removed, but only its repository\n"
-        hlp += "If set in move mode, only the submodule's repository will be moved to the destination.\n"
-        hlp += "The configuration will remain unaltered, and is expected to point to the destination path already"""
-        group.add_option("--skip-configuration", action='store_true', default=False, help=hlp)
-        
-        hlp  = "If set in remove mode, the submodule's repository will not be removed and remain on disk\n"
-        hlp += "If set in move mode, the submodule's repository will not be moved, only the submodule's configuration will be altered."
-        group.add_option('--skip-module', action='store_true', default=False, help=hlp)
-        
-        hlp = "If set, the operation will be simulated, but not actually performed, i.e. everything remains unchanged.\n"
-        hlp += "Only meaningful for update and remove operations."
-        group.add_option("-n", "--dry-run", action='store_true', default=False, help=hlp)
-        
-        parser.add_option_group(group)
+        help = "If set, the submodule's repository will be removed even though it contains modifications"
+        sp.add_argument("--force", action='store_true', default=False, help=help)
 
-        return parser
+        help  = "The submodule's configuration will not be removed, but only its repository."
+        help += "The configuration will remain unaltered, and is expected to point to the destination path already."
+        sp.add_argument("--skip-configuration", action='store_true', default=False, help=help)
+
+        help  = "The submodule's repository will not be removed and remain on disk."
+        help += "only the submodule's configuration will be altered."
+        sp.add_argument('--skip-module', action='store_true', default=False, help=help)
+
+        help  = "If set, the operation will be simulated, but not actually performed, "
+        help += "i.e. everything remains unchanged."
+        sp.add_argument("-n", "--dry-run", action='store_true', default=False, help=help)
+
+        
+        return self
 
     ## -- End Base Implementation -- @}
     
     def execute(self, args, remaining_args):
         """Perform the requested operation"""
-        cmd = args.mode
+        cmd = args.operation
         
-        if cmd == self.k_query:
+        if cmd == self.OP_QUERY:
             self._exec_query(args)
-        elif cmd == self.k_add:
+        elif cmd == self.OP_ADD:
             self._exec_add(args)
-        elif cmd == self.k_remove:
+        elif cmd == self.OP_REMOVE:
             self._exec_remove(args)
-        elif cmd == self.k_move:
+        elif cmd == self.OP_MOVE:
             self._exec_move(args)
-        elif cmd == self.k_update:
+        elif cmd == self.OP_MODIFY:
             self._exec_update(args)
         else:
             raise self.parser.error("Invalid operation: %r" % cmd)

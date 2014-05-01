@@ -7,5 +7,7 @@
 """
 
 from .base import PGitCommand
+
+# Have to import all submodules here
 from .submodule import *
 

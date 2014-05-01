@@ -153,6 +153,9 @@ to be compared against the currently checked-out commit. Otherwise it defaults t
         help += "i.e. everything remains unchanged."
         sp.add_argument("-n", "--dry-run", action='store_true', default=False, help=help)
 
+        help = "One or more names of submodules to remove"
+        sp.add_argument('names', nargs='+', help=help)
+
         
         return self
 
@@ -248,20 +251,16 @@ to be compared against the currently checked-out commit. Otherwise it defaults t
         sm.move(destpath, configuration=not options.skip_configuration, module=not options.skip_module)
         print "Successfully moved the repository of submodule %r to %s" % (sm.name, sm.path)
         
-    def _exec_remove(self, options, args):
-        if len(args) < 1:
-            raise self.parser.error("Need a at least one submodule's name to remove")
-        #END handle args
-        
+    def _exec_remove(self, args):
         for sm in self.repo.submodules:
-            if sm.name not in args:
+            if sm.name not in args.names:
                 continue
             #END filter by name
             
-            sm.remove(  module=not options.skip_module, 
-                        configuration=not options.skip_configuration,
-                        dry_run=options.dry_run,
-                        force=options.force
+            sm.remove(  module=not args.skip_module, 
+                        configuration=not args.skip_configuration,
+                        dry_run=args.dry_run,
+                        force=args.force
                     )
         #END for each submodule
     

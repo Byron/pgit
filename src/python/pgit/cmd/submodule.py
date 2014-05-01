@@ -68,9 +68,16 @@ class SubmoduleCommand(PGitSubCommand, bapp.plugin_type()):
         """Default implementation adds nothing. This is common if you use subcommands primarily"""
         super(SubmoduleCommand, self).setup_argparser(parser)
 
+        help = """The submodule command allows you to interact with git-submodules, that is you may query data about
+them, as well as change them in a variety of ways.
+
+The main benefit of this implementation is its ability to update submodules keeping the actual change in mind, 
+which allows you to synchronize your submodules the same way as git synchronizes the rest of your working tree.
+
+Have a look at https://github.com/Byron/pgit/blob/master/src/md/submodule.md for more details"""
         subparsers = parser.add_subparsers(title='Operation',
                                            dest=self.OPERATION,
-                                           description="An operation to perform on one or more submodules")
+                                           description=help)
         
         # QUERY
         ########
@@ -81,21 +88,24 @@ class SubmoduleCommand(PGitSubCommand, bapp.plugin_type()):
 
         # UPDATE
         ########
-        help = "Change an existing submodule"
+        help = "Update re-synchronizes all submodules recursively, assuring that your working- tree including all \
+submodules corresponds to the state stored in the repository. This will properly deal with removed, added and \
+changed submodules as well."
         sp = subparsers.add_parser(self.OP_UPDATE, description=help, help=help)
 
 
-        help = """If set, updates will not be handled recursively, but instead only
-affect the direct submodules of the curent repository. This usually causes inconsistent
-checkouts as children of said submodules might require an update too"""
+        help = "If set, updates will not be handled recursively, but instead only \
+affect the direct submodules of the curent repository. This usually causes inconsistent \
+checkouts as children of said submodules might require an update too"
         sp.add_argument('--non-recursive', action='store_true', default=False, help=help)
         
-        help = """If set, the sha of the submodule will be ignored. Instead, the
-submodule's repository will be updated to the latest available revision"""
+        help = "Instead of using the submodule's sha as hint to which revision to update the submodule's repository,\
+update it the latest available revision in the remote repository."
         sp.add_argument('-l', '--to-latest-revision', action='store_true', help=help)
         
-        help = """If set, the given rev-spec defines the commit that should be used 
-to be compared against the currently checked-out commit. Otherwise it defaults to HEAD@{1}"""
+        help = "Specifies the commit rev-spec to use (e.g. HEAD~1, ORIG_HEAD, HEAD@{1}) as basis for the comparison \
+with the currently checked-out commit in the root-repository. From the difference of the commits the command \
+determines the changes."
         sp.add_argument('--base-commit', default=None, help=help)
 
         help  = "If set, the operation will be simulated, but not actually performed, "
@@ -131,7 +141,8 @@ to be compared against the currently checked-out commit. Otherwise it defaults t
 
         # MOVE
         ######
-        help = "move a submodule to a different directory"
+        help = "The move operation allows you to move the submodule's repository to a different place in the \
+repository. This effectively changes the path at which it resides"
         sp = subparsers.add_parser(self.OP_MOVE, description=help, help=help)
 
         help  = "Only the submodule's repository will be moved to the destination."
@@ -150,7 +161,8 @@ to be compared against the currently checked-out commit. Otherwise it defaults t
         
         # REMOVE
         ########
-        help = "remove a submodule entirely"
+        help = "The operation removes an existing submodule. It will, by default, not remove the submodule's \
+repository if it contains any user modifications"
         sp = subparsers.add_parser(self.OP_REMOVE, description=help, help=help)
         
         help = "If set, the submodule's repository will be removed even though it contains modifications"

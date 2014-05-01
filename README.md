@@ -1,7 +1,6 @@
 ## pgit (PeeGit)
 
-
-Besides the name being funny, pgit wants to become a fully usable git command-line implementation in python one day.
+**pgit** ('pee-git') is a git command-line interface written in python. It aims to fix shortcomings and convenience issues arising with the traditional c-git implementation, but does for now not strive to be feature-complete.
 
 At the current stage, its just meant to expose special features, namely submodul handling, of git-python to the command-line, but at some point it might start driving git-python into new directions.
 

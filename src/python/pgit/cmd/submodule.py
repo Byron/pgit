@@ -10,6 +10,7 @@ __all__ = ['UpdateProgress', 'SubmoduleCommand']
 
 import bapp
 from butility import Version
+
 from .base import PGitSubCommand
 
 from git import ( Submodule,
@@ -98,16 +99,25 @@ to be compared against the currently checked-out commit. Otherwise it defaults t
         
         # ADD
         ######
-        help = "add submodules to the current git repository"
+        help = "Add an existing or newly checked-out submodule to the current git repository."
         sp = subparsers.add_parser(self.OP_ADD, description=help, help=help)
 
-        help = "Specify a tracking branch to use if it is not 'master', which is the default"
-        sp.add_argument('-b', '--branch', default='master', help=help)
+        help = "Specify a tracking branch to use, like 'master'. If unset, there will be no tracking branch."
+        sp.add_argument('-b', '--branch', default=None, help=help)
         
         help  = "If set, the new submodule's repository will be cloned, but not checkedout,"
         help += "i.e. the working tree is empty"
         sp.add_argument('--no-checkout', action='store_true', default=False, help=help)
-        
+
+        help = "The name of the newly added submodule"
+        sp.add_argument('name', help=help)
+
+        help = "Path at which the submodule was checked out, or will be checked out if url is given too."
+        sp.add_argument('path', help=help)
+
+        help = "The url from which to clone the submodule, in case it doesn't exist at 'path'"
+        sp.add_argument('url', nargs='?', default=None, help=help)
+
 
         # MOVE
         ######
@@ -224,13 +234,9 @@ to be compared against the currently checked-out commit. Otherwise it defaults t
             # END for each submodule
         # END handle filter
     
-    def _exec_add(self, options, args):
+    def _exec_add(self, args):
         """Add a new submodule. The last arg may be the url, which is optional"""
-        if len(args) < 2 or len(args) > 3:
-            raise self.parser.error("arguments may be: name path [url]")
-        # END handle arg count
-        
-        sm = Submodule.add(self.repo, *args, branch=options.branch, no_checkout=options.no_checkout)
+        sm = Submodule.add(self.repo, args.name, args.path, args.url, branch=args.branch, no_checkout=args.no_checkout)
         print "Created submodule %r at path %s" % (sm.name, sm.path)
         
     def _exec_move(self, options, args):

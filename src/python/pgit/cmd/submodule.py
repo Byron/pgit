@@ -244,7 +244,25 @@ to be compared against the currently checked-out commit. Otherwise it defaults t
             # only updated specific modules .. smartly,but not based on our root
             for sm in sms:
                 if sm.name in names and sm.module_exists():
-                    RootModule(sm.module()).update(**kwargs)
+                    # As RootModule will ignore the parent module :(, we have to try to 
+                    # get a pull done. Will just use git for that
+                    smm = sm.module()
+                    if not smm.head.ref.tracking_branch():
+                        self.log().info("Can't update submodule '%s' as there is no tracking branch", sm.name)
+                    else:
+                        # end handle missing tracking setup
+                        try:
+                            if args.dry_run:
+                                self.log().info("WOULD pull '%s' submodule", sm.name)
+                            else:
+                                self.log().info("Pulling submodule '%s'", sm.name)
+                                smm.git.pull()
+                            # end handle dryrun
+                        except GitCommandError, err:
+                            self.log().debug("Failed to pull submodule '%s' with error: %s", sm.name, str(err))
+                        # end ignore exceptions
+                    # end handle has tracking branch setup
+                    RootModule(smm).update(**kwargs)
                 # END if name matches filter
             # END for each submodule
         # END handle filter

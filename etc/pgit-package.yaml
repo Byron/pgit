@@ -3,7 +3,9 @@ packages:
   pgit: ##
   #######
     name: pgit executable
-    requires: pgit-package
+    requires: 
+      - pgit-package
+      - python
     alias: python
     arguments:
       prepend:
@@ -21,7 +23,6 @@ packages:
     url: https://github.com/Byron/pgit
     requires:
       # these requirements are to be defined in the distribution
-      - python
       - git-python
       - bcore
     environment:

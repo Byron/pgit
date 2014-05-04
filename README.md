@@ -24,6 +24,8 @@ Please find a listing of all currently available commands below.
 
 ### Development Status
 
+[![Build Status](https://travis-ci.org/Byron/pgit.svg?branch=master)](https://travis-ci.org/Byron/pgit)
+
 This project currently evolves only when I need a special purpose command that isn't easily achieved through the git commandline.
 
 Therefore it, or its main dependency, git-python, will attention sporadically.

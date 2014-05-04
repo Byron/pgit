@@ -1,0 +1,11 @@
+language: python
+python:
+  - "2.6"
+  - "2.7"
+  # - "pypy" - doesn't work for bcore
+
+install:
+  - pip install git+https://github.com/Byron/bcore.git
+  - pip install git+https://github.com/gitpython-developers/GitPython
+
+script: nosetests src/python

@@ -35,7 +35,6 @@ class TestCmdBase(TestCaseBase):
     @classmethod
     def setUpClass(cls):
         """Fix the read-only repo to use ours instead"""
-        super(TestCmdBase, cls).setUpClass()
         cls.rorepo = Repo(os.path.dirname(__file__))
         
     #END overrides

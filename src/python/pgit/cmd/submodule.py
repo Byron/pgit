@@ -193,12 +193,17 @@ repository if it contains any user modifications"
         cmd = args.operation
         
         try:
-            {self.OP_QUERY : self._exec_query,
-             self.OP_ADD   : self._exec_add,
-             self.OP_REMOVE: self._exec_remove,
-             self.OP_MOVE  : self._exec_move,
-             self.OP_UPDATE: self._exec_update}[cmd](args)
-        except KeyError:
+            lut = {  self.OP_QUERY : self._exec_query,
+                     self.OP_ADD   : self._exec_add,
+                     self.OP_REMOVE: self._exec_remove,
+                     self.OP_MOVE  : self._exec_move,
+                     self.OP_UPDATE: self._exec_update  }
+
+            if cmd not in lut:
+                # raise a more special exception, sometimes git-python raises KeyError as well
+                raise EnvironmentError
+            lut[cmd](args)
+        except EnvironmentError:
             raise InputError("Invalid operation: %r" % cmd)
         #END handle operation
         

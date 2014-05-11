@@ -28,3 +28,9 @@ packages:
     environment:
       variables:
         PYTHONPATH: src/python
+
+  nosetests:
+    # make sure testing works from the parent assembly
+    requires:
+      - pgit-package
+

@@ -201,9 +201,9 @@ repository if it contains any user modifications"
 
             if cmd not in lut:
                 # raise a more special exception, sometimes git-python raises KeyError as well
-                raise EnvironmentError
+                raise AssertionError
             lut[cmd](args)
-        except EnvironmentError:
+        except AssertionError:
             raise InputError("Invalid operation: %r" % cmd)
         #END handle operation
         

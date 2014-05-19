@@ -8,8 +8,8 @@
 """
 __all__ = ['PGitCommand', 'PGitSubCommand']
 
-from bcmd import (CommandBase, 
-                  SubCommandBase)
+from bcmd import (Command, 
+                  SubCommand)
 from butility import Version
 
 from git import Repo
@@ -19,7 +19,7 @@ __all__ = ['PGitCommand']
 
 #{Classes
 
-class PGitCommand(CommandBase):
+class PGitCommand(Command):
     """Implements functinality common to all pgit commands
     
     We initialize a member called 'repo' which provides a Repo instance based on 
@@ -45,7 +45,7 @@ class PGitCommand(CommandBase):
 #}END classes
 
 
-class PGitSubCommand(SubCommandBase):
+class PGitSubCommand(SubCommand):
     """A pgit subcommand should derive from this type, setting its name member accordingly"""
 
     # -------------------------

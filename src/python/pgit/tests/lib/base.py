@@ -1,7 +1,7 @@
 """Provide base classes for the test system"""
 import bapp
 
-from butility.tests import TestCaseBase
+from butility.tests import TestCase
 from bapp.tests import with_application
 import git.cmd
 from git import Repo
@@ -15,7 +15,7 @@ import cStringIO
 __all__ = ['TestCmdBase', 'with_application']
 
 
-class TestCmdBase(TestCaseBase):
+class TestCmdBase(TestCase):
     """Foundation class from which all command test should derive to obtain
     command-specific testing utilities.
     

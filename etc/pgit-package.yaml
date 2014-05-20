@@ -14,8 +14,8 @@ packages:
   #################
   pgit-package: ##
   ###############
-    # This is the executable configuration
-    # NOTE: This package requires it's tree to be set, which is done in the distribution
+    trees:
+      - '{settings-files.pgit-package.dirname}/..'
     name: pgit
     description: |
       Besides the name being funny, pgit wants to become a fully usable 
@@ -28,9 +28,3 @@ packages:
     environment:
       variables:
         PYTHONPATH: src/python
-
-  nosetests:
-    # make sure testing works from the parent assembly
-    requires:
-      - pgit-package
-

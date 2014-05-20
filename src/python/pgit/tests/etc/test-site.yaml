@@ -1,0 +1,6 @@
+packages:
+  nosetests:
+    # make sure testing works from the parent assembly
+    requires:
+      - pgit-package
+

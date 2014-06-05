@@ -15,7 +15,7 @@ packages:
   pgit-package: ##
   ###############
     trees:
-      - '{settings-files.pgit-package.dirname}/..'
+      - '{yaml.pgit-package.dirname}/..'
     name: pgit
     description: |
       Besides the name being funny, pgit wants to become a fully usable 
